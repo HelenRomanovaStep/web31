@@ -1,0 +1,8 @@
+/* Form.css */
+.form-container{
+    width: 500px;
+    margin:0 auto;
+    padding: 40px;
+    background: #e4eaec;
+    border-radius: 8px;
+}
