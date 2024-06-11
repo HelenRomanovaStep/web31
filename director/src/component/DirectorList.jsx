@@ -1,5 +1,5 @@
 //DirectorList.jsx
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import './Director.css';
 import Director from './Director.jsx';
 import Form from './Form.jsx';
@@ -33,14 +33,24 @@ let directors=[
 ]
 
 function DirectorList(){
-    let [directorList,setDirectorList]=useState(directors);
+    let [directorList,setDirectorList]=useState(JSON.parse(localStorage.getItem('dir')));
+    useEffect(()=>{
+        console.log(directorList.length);        
+        localStorage.setItem('dir',JSON.stringify(directorList))
+    },[directorList])
+   
     const add=(newDirector)=>{      
         let id = directorList.length +1;
         newDirector = {
             id: id,
             ...newDirector 
         }
+     
         setDirectorList([...directorList,newDirector])
+    }
+
+    const remove=(id)=>{
+        setDirectorList(directorList=>directorList.filter(el=>el.id!==id))
     }
     return(
         <div className="director">
@@ -49,6 +59,7 @@ function DirectorList(){
               { directorList.map(director=>
                 <Director key={director.id}              
                     {...director}
+                    action={()=>remove(director.id)}
                  />
                 )
               }        
