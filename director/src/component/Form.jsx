@@ -8,8 +8,8 @@ function Form(props){
     let [valid, setValid]=useState(false);
 
     const isValid=(str)=>{
-        let reg = /^\w/;      
-       return(str.length>=3&&reg.test(str))
+        let reg = /^[a-zA-Zа-яА-Я ]+$/gi;      
+        return(str.length>=3&&reg.test(str))
     }
 
     const handlerChange=(event)=>{

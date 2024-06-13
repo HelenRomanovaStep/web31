@@ -1,5 +1,5 @@
 //DirectorList.jsx
-import React, {useState,useEffect} from 'react';
+import React, {useState,useEffect,useReducer} from 'react';
 import './Director.css';
 import Director from './Director.jsx';
 import Form from './Form.jsx';
@@ -32,34 +32,67 @@ let directors=[
    } 
 ]
 
+function reducer(directorList,action){
+    
+  if (action.type=='remove'){return directorList.filter(el=>el.id!==action.id)}
+   
+  if (action.type=='add') {return [...directorList,{
+    id: action.id,
+    ...action.newDirector
+   }]}
+}
 function DirectorList(){
-    let [directorList,setDirectorList]=useState(JSON.parse(localStorage.getItem('dir')));
+    const [directorList,dispatch]=useReducer(
+        reducer,
+        localStorage.getItem('dir').length==0
+           ? JSON.parse(localStorage.getItem('dir'))
+          :directors )
+
+
+    // let [directorList,setDirectorList]=useState(
+    //        localStorage.getItem('dir').length==0
+    //        ? JSON.parse(localStorage.getItem('dir'))
+    //        :directors
+    //     );    
     useEffect(()=>{
-        console.log(directorList.length);        
+        console.log(directorList);  
+        console.log('max=',directorList.reduce((max,item)=>max.id>item.id?max.id:item.id,directorList[0]?.id||0));      
         localStorage.setItem('dir',JSON.stringify(directorList))
     },[directorList])
    
-    const add=(newDirector)=>{      
-        let id = directorList.length +1;
-        newDirector = {
-            id: id,
-            ...newDirector 
-        }
+    // const add=(newDirector)=>{      
+    //     let id = directorList.reduce((max,item)=>max.id>item.id?max.id:item.id,directorList[0]?.id||0)+1;
+    //     newDirector = {
+    //         id: id,
+    //         ...newDirector 
+    //     }
      
-        setDirectorList([...directorList,newDirector])
-    }
+    //     //setDirectorList([...directorList,newDirector])
+    // }
 
-    const remove=(id)=>{
-        setDirectorList(directorList=>directorList.filter(el=>el.id!==id))
-    }
+    // const remove=(id)=>{
+    //     //setDirectorList(directorList=>directorList.filter(el=>el.id!==id))
+    // }
+
+
     return(
-        <div className="director">
-            <Form action={add}/>
+        <div className="director">         
+            <Form action = {(newDirector)=>dispatch(
+                {
+                type: 'add',
+                newDirector: newDirector,
+                id:  directorList.reduce((max,item)=>max.id>item.id?max.id:item.id,directorList[0]?.id||0)+1
+               }
+            )}  /> 
              <ul className="list">
               { directorList.map(director=>
                 <Director key={director.id}              
-                    {...director}
-                    action={()=>remove(director.id)}
+                    {...director}                    
+                    action={()=>dispatch({
+                        type: 'remove',
+                        id: director.id
+                        })
+                    }
                  />
                 )
               }        
